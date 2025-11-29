@@ -285,7 +285,7 @@ In the left sidebar, go to Database Access → Add New Database User.
 
 **✅ Final connection string used:**
 
-   `mongodb+srv://admin:admin123@appproject.fc9xifh.mongodb.net/?appName=appproject`
+   
 
 **6: Create the .env File**
 
