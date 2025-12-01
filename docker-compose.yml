@@ -1,30 +1,77 @@
-version: "3.8"  # Docker Compose file format version
+
+
+# services:
+#   backend:  # Backend service definition
+#     build: ./backend  # Path to backend Dockerfile
+#     container_name: backend_container  # Name of the backend container
+#     image: yourdockerhubusername/backend:v1  # Image name and tag (push to/pull from Docker Hub)
+#     ports:
+#       - "5000:5000"  # Map host port 5000 to container port 5000
+#     env_file:
+#       - ./backend/.env.example # Load environment variables from backend/.env file
+#     networks:
+#       - app-network  # Connect backend to custom network for inter-container communication
+#     restart: on-failure  # Restart container automatically if it crashes
+
+
+#   frontend:  # Frontend service definition
+#     build: ./frontend  # Path to frontend Dockerfile
+#     container_name: frontend_container  # Name of the frontend container
+#     image: yourdockerhubusername/frontend:v1  # Image name and tag (push to/pull from Docker Hub)
+#     ports:
+#       - "80:80"  # Map host port 80 to container port 80
+#     depends_on:
+#       - backend  # Ensure backend starts before frontend
+#     networks:
+#       - app-network  # Connect frontend to same network as backend for communication
+
+# networks:
+#   app-network:  # Define a custom bridge network
+#     driver: bridge  # Bridge driver allows communication between containers
 
 services:
-  backend:  # Backend service definition
-    build: ./backend  # Path to backend Dockerfile
-    container_name: backend_container  # Name of the backend container
-    image: yourdockerhubusername/backend:v1  # Image name and tag (push to/pull from Docker Hub)
+  backend:
+    build: ./backend
+    container_name: backend_container
+    image: yourdockerhubusername/backend:v1
     ports:
-      - "5000:5000"  # Map host port 5000 to container port 5000
+      - "5000:5000"
     env_file:
-      - ./backend/.env  # Load environment variables from backend/.env file
-    networks:
-      - app-network  # Connect backend to custom network for inter-container communication
-    restart: on-failure  # Restart container automatically if it crashes
-
-  frontend:  # Frontend service definition
-    build: ./frontend  # Path to frontend Dockerfile
-    container_name: frontend_container  # Name of the frontend container
-    image: yourdockerhubusername/frontend:v1  # Image name and tag (push to/pull from Docker Hub)
-    ports:
-      - "80:80"  # Map host port 80 to container port 80
+      - ./backend/.env
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/mydatabase   # IMPORTANT
     depends_on:
-      - backend  # Ensure backend starts before frontend
+      - mongo
     networks:
-      - app-network  # Connect frontend to same network as backend for communication
+      - app-network
+    restart: on-failure
+
+  frontend:
+    build: ./frontend
+    container_name: frontend_container
+    image: yourdockerhubusername/frontend:v1
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+  mongo:
+    image: mongo:6
+    container_name: mongo_container
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - app-network
 
 networks:
-  app-network:  # Define a custom bridge network
-    driver: bridge  # Bridge driver allows communication between containers
+  app-network:
+    driver: bridge
+
+volumes:
+  mongo_data:
 
